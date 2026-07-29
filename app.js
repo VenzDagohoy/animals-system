@@ -199,7 +199,7 @@ editForm.addEventListener("submit", async (e) => {
 
         if (!response.ok) {
             const result = await response.json();
-            alert("Error updating: " + result.message);
+            alert(result.message);
             
             editForm.reset(); 
             return;
