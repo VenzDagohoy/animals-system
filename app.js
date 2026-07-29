@@ -1,6 +1,7 @@
 // const API_URL = "http://localhost:3000/animals";
 // const API_URL = "https://animal-api-v8to.onrender.com/animals";
 const API_URL = "https://animals-backend-r0h2.onrender.com/animals";
+// const API_URL = "https://backend-animals-i5yl.onrender.com/animals";
 
 const animalForm = document.getElementById("animal-form");
 const animalList = document.getElementById("animal-list");
@@ -166,7 +167,7 @@ animalForm.addEventListener("submit", async (e) => {
 });
 
 // PUT edit animal
-// Show form and fill it with data
+// Show form and fill with data
 function openEditForm(id, name, legs) {
     editCard.style.display = "block";
     document.getElementById("edit-id").value = id;
@@ -175,7 +176,7 @@ function openEditForm(id, name, legs) {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Hide the form and reset inputs
+// Hide form and reset inputs
 function cancelEdit() {
     editCard.style.display = "none"; 
     editForm.reset(); 
@@ -204,6 +205,9 @@ editForm.addEventListener("submit", async (e) => {
             return;
         }
 
+        const result = await response.json(); 
+        alert(result.message);
+
         cancelEdit();
         fetchAnimals(); 
     } catch (error) {
@@ -222,6 +226,7 @@ async function deleteAnimal(id) {
         });
 
         if (response.ok) {
+            alert("Animal deleted successfully!");
             fetchAnimals();
         } else {
             alert("Failed to delete animal.");
