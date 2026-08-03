@@ -3,6 +3,31 @@
 const API_URL = "https://animals-backend-r0h2.onrender.com/animals";
 // const API_URL = "https://backend-animals-i5yl.onrender.com/animals";
 
+// NEW: 1. Check login state immediately on load
+const token = localStorage.getItem("accessToken");
+if (!token) {
+    window.location.href = "./login.html";
+}
+
+// NEW: 2. Handle Logout
+const logoutBtn = document.getElementById("logout-btn");
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("accessToken");
+        window.location.href = "./login.html";
+    });
+}
+
+// NEW: Helper function to force logout on 401 errors
+function handleUnauthorized(response) {
+    if (response.status === 401) {
+        localStorage.removeItem("accessToken");
+        window.location.href = "./login.html";
+        return true;
+    }
+    return false;
+}
+
 const animalForm = document.getElementById("animal-form");
 const animalList = document.getElementById("animal-list");
 const animalTable = document.getElementById("animal-table");
@@ -12,14 +37,13 @@ const searchMessage = document.getElementById("search-message");
 const editCard = document.getElementById("edit-card");
 const editForm = document.getElementById("edit-form");
 
-// GET fetch all animals
+// GET fetch all animals (Public route, no token needed)
 async function fetchAnimals() {
     searchMessage.textContent = "";
     searchMessage.className = "message";
     document.getElementById("searchId").value = "";
     document.getElementById("searchName").value = ""; 
     document.getElementById("filterLegs").value = "";
-
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error("Server error"); 
@@ -31,29 +55,23 @@ async function fetchAnimals() {
     }
 }
 
-// GET search by id
+// GET search by id (Public route)
 async function searchById() {
     const id = document.getElementById("searchId").value;
     if (!id) return;
-    
-    // Clear inputs
     document.getElementById("searchName").value = "";
     document.getElementById("filterLegs").value = "";
     searchMessage.textContent = "";
-
     try {
         const response = await fetch(`${API_URL}/${id}`);
         const data = await response.json();
-        
         if (!response.ok) {
-            // Render table handle 404 message
             if (response.status === 404) {
                 renderTable([]);
                 return;
             }
             throw new Error(data.message);
         }
-        
         renderTable([data.animal]); 
     } catch (error) {
         console.error("Error searching by ID:", error);
@@ -62,22 +80,17 @@ async function searchById() {
     }
 }
 
-// GET search by name
+// GET search by name (Public route)
 async function searchByName() {
     const name = document.getElementById("searchName").value;
     if (!name) return;
-    
-    // Clear inputs
     document.getElementById("searchId").value = "";
     document.getElementById("filterLegs").value = "";
     searchMessage.textContent = "";
-
     try {
         const response = await fetch(`${API_URL}?name=${name}`);
         if (!response.ok) throw new Error("Server error"); 
         const data = await response.json();
-        
-        // Render table handle the empty array natively
         renderTable(data.animals); 
     } catch (error) {
         console.error("Error searching by Name:", error);
@@ -86,21 +99,17 @@ async function searchByName() {
     }
 }
 
-// GET filter by legs
+// GET filter by legs (Public route)
 async function filterByLegs() {
     const legs = document.getElementById("filterLegs").value;
     if (!legs) return;
-    
-    // Clear orphaned inputs
     document.getElementById("searchId").value = "";
     document.getElementById("searchName").value = "";
     searchMessage.textContent = "";
-
     try {
         const response = await fetch(`${API_URL}?numLegs=${legs}`);
         if (!response.ok) throw new Error("Server error"); 
         const data = await response.json();
-        
         renderTable(data.animals);
     } catch (error) {
         console.error("Error filtering by legs:", error);
@@ -109,17 +118,15 @@ async function filterByLegs() {
     }
 }
 
-// Render table utility
+// Render table utility function
 function renderTable(animals) {
     loadingDiv.style.display = "none";
     animalTable.style.display = "table"; 
     animalList.innerHTML = "";
-
     if (!animals || animals.length === 0) {
         animalList.innerHTML = `<tr><td colspan="4" class="text-center">No animals found.</td></tr>`;
         return;
     }
-
     animals.forEach(animal => {
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -135,27 +142,30 @@ function renderTable(animals) {
     });
 }
 
-// POST add animal
+// POST add animal (Protected route)
 animalForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("name").value;
     const numLegs = Number(document.getElementById("numLegs").value);
-
     try {
         const response = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // NEW: 3. Attach token
+            },
             body: JSON.stringify({ name, numLegs })
         });
+        
+        // NEW: 4. Check for unauthorized access
+        if (handleUnauthorized(response)) return;
 
         const result = await response.json();
-
         if (!response.ok) {
             formMessage.textContent = result.message;
             formMessage.className = "message error";
             return;
         }
-
         formMessage.textContent = "Animal added successfully!";
         formMessage.className = "message success";
         animalForm.reset();
@@ -166,48 +176,48 @@ animalForm.addEventListener("submit", async (e) => {
     }
 });
 
-// PUT edit animal
 // Show form and fill with data
-function openEditForm(id, name, legs) {
+window.openEditForm = function(id, name, legs) {
     editCard.style.display = "block";
     document.getElementById("edit-id").value = id;
     document.getElementById("edit-name").value = name;
     document.getElementById("edit-numLegs").value = legs;
     window.scrollTo({ top: 0, behavior: "smooth" });
-}
+};
 
 // Hide form and reset inputs
-function cancelEdit() {
+window.cancelEdit = function() {
     editCard.style.display = "none"; 
     editForm.reset(); 
-}
+};
 
-// Submit changes
+// PUT edit animal (Protected route)
 editForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
     const id = document.getElementById("edit-id").value;
     const name = document.getElementById("edit-name").value;
     const numLegs = Number(document.getElementById("edit-numLegs").value);
-
     try {
         const response = await fetch(`${API_URL}/${id}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // NEW: 3. Attach token
+            },
             body: JSON.stringify({ name, numLegs })
         });
+
+        // NEW: 4. Check for unauthorized access
+        if (handleUnauthorized(response)) return;
 
         if (!response.ok) {
             const result = await response.json();
             alert(result.message);
-            
             editForm.reset(); 
             return;
         }
-
         const result = await response.json(); 
         alert(result.message);
-
         cancelEdit();
         fetchAnimals(); 
     } catch (error) {
@@ -216,14 +226,19 @@ editForm.addEventListener("submit", async (e) => {
     }
 });
 
-// DELETE remove animal
-async function deleteAnimal(id) {
+// DELETE remove animal (Protected route)
+window.deleteAnimal = async function(id) {
     if (!confirm("Are you sure you want to delete this animal?")) return;
-
     try {
         const response = await fetch(`${API_URL}/${id}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}` // NEW: 3. Attach token
+            }
         });
+
+        // NEW: 4. Check for unauthorized access
+        if (handleUnauthorized(response)) return;
 
         if (response.ok) {
             alert("Animal deleted successfully!");
@@ -234,7 +249,7 @@ async function deleteAnimal(id) {
     } catch (error) {
         console.error("Error deleting animal:", error);
     }
-}
+};
 
 // Initialize app on load
 fetchAnimals();

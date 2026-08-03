@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal API Login</title>
+    <link rel="stylesheet" href="style.css"> <!-- Reusing your existing styles -->
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <div class="card">
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input id="email" type="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input id="password" type="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Log in</button>
+            </form>
+            <p id="message" class="message"></p>
+        </div>
+    </div>
+    <script type="module" src="./login.js"></script>
+</body>
+</html>

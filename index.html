@@ -8,7 +8,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Animal Management System</h1>
+        
+        <!-- Header with Title and Logout Button -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 style="margin: 0;">Animal Management System</h1>
+            <button id="logout-btn" class="btn-danger">Log out</button>
+        </div>
         
         <!-- Add Animal Form -->
         <div class="card">
@@ -53,12 +58,10 @@
                 <input type="number" id="searchId" placeholder="Search by ID...">
                 <button onclick="searchById()" class="btn-primary">Search ID</button>
             </div>
-
             <div class="search-row">
                 <input type="text" id="searchName" placeholder="Search by Animal Name...">
                 <button onclick="searchByName()" class="btn-primary">Search Name</button>
             </div>
-
             <div class="search-row no-margin">
                 <input type="number" id="filterLegs" placeholder="Filter by Legs...">
                 <button onclick="filterByLegs()" class="btn-primary">Filter Legs</button>
@@ -87,7 +90,7 @@
             </table>
         </div>
     </div>
-
+    
     <script src="app.js"></script>
 </body>
 </html>
