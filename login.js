@@ -1,4 +1,4 @@
-const API_URL = "https://animals-backend-r0h2.onrender.com/auth/login";
+const API_URL = "https://animals-backend-r0h2.onrender.com";
 const loginForm = document.querySelector("#login-form");
 const message = document.querySelector("#message");
 
