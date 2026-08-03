@@ -1,12 +1,21 @@
 const API_URL = "https://animals-backend-r0h2.onrender.com";
+
 const loginForm = document.querySelector("#login-form");
 const message = document.querySelector("#message");
+const loginBtn = document.querySelector("#login-btn"); 
+const loadingDiv = document.querySelector("#loading");
 
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     
     const email = document.querySelector("#email").value;
     const password = document.querySelector("#password").value;
+    
+    // Show text loading, disable button, clear errors
+    loginBtn.disabled = true;
+    loadingDiv.style.display = "block";
+    message.textContent = ""; 
+    message.className = "message";
     
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
@@ -22,21 +31,29 @@ loginForm.addEventListener("submit", async (event) => {
         if (!response.ok) {
             message.textContent = data.message ?? "Login failed";
             message.className = "message error";
+            
+            // Hide loading, re-enable button
+            loadingDiv.style.display = "none";
+            loginBtn.disabled = false;
             return;
         }
         
-        // Save the JWT to the browser
         localStorage.setItem("accessToken", data.accessToken);
         
+        // Hide loading on success
+        loadingDiv.style.display = "none";
         message.textContent = "Login successful";
         message.className = "message success";
         
-        // Redirect to the main animals dashboard
-        window.location.href = "./index.html"; 
+        window.location.href = "./index.html";
         
     } catch (error) {
         console.error(error);
         message.textContent = "Unable to connect to the API";
         message.className = "message error";
+        
+        // Hide loading, re-enable button on error
+        loadingDiv.style.display = "none";
+        loginBtn.disabled = false;
     }
 });

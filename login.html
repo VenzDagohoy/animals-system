@@ -21,9 +21,11 @@
                     <label>Password</label>
                     <input id="password" type="password" required>
                 </div>
-                <!-- Inline style added to stretch button full width -->
-                <button type="submit" class="btn-primary" style="width: 100%;">Log in</button>
+                <button type="submit" id="login-btn" class="btn-primary" style="width: 100%;">Log in</button>
             </form>
+            
+            <!-- NEW: The simple text loading div -->
+            <div id="loading" style="display: none; text-align: center; margin-top: 15px; font-weight: bold; color: var(--text-muted);">Logging in...</div>
             
             <p id="message" class="message"></p>
             
