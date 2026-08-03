@@ -28,6 +28,12 @@ body {
     margin: 0 auto;
 }
 
+/* NEW: Narrower container specifically for login/register pages */
+.auth-container {
+    max-width: 400px;
+    margin-top: 8vh;
+}
+
 h1 {
     text-align: center;
     color: var(--primary);
@@ -60,7 +66,10 @@ label {
     color: var(--text-main);
 }
 
-input[type="text"], input[type="number"] {
+input[type="text"], 
+input[type="number"], 
+input[type="email"], 
+input[type="password"] {
     width: 100%;
     padding: 10px;
     border: 1px solid var(--border);
@@ -80,13 +89,10 @@ input[type="text"], input[type="number"] {
 
 .btn-primary { background-color: var(--primary); color: var(--surface); }
 .btn-primary:hover { background-color: var(--primary-hover); }
-
 .btn-danger { background-color: var(--danger); color: var(--surface); }
 .btn-danger:hover { background-color: var(--danger-hover); }
-
 .btn-secondary { background-color: var(--secondary); color: var(--surface); }
 .btn-secondary:hover { background-color: var(--secondary-hover); }
-
 .btn-neutral { background-color: var(--neutral); color: var(--surface); }
 .btn-neutral:hover { background-color: var(--neutral-hover); }
 
@@ -142,6 +148,25 @@ th {
 }
 
 /* Alerts */
-.message { margin-top: 10px; font-weight: bold; }
+.message { 
+    margin-top: 10px; 
+    font-weight: bold; 
+}
 .error { color: var(--danger); }
 .success { color: var(--success); }
+
+/* NEW: Auth Links for toggling between login and register */
+.auth-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.auth-link a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
